@@ -1,26 +1,17 @@
-package ggsbot.service;
+package ggsbot.model.access;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
-import ggsbot.model.Point;
+import ggsbot.model.data.Point;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class PointDao {
-
-    public PointDao() {
-        LoggerContext logContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-
-        Logger logHiber = logContext.getLogger("org.hibernate");
-        logHiber.setLevel(Level.INFO);
-    }
 
     final private static SessionFactory factory;
 

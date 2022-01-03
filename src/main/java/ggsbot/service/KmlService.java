@@ -1,10 +1,12 @@
 package ggsbot.service;
 
-import ggsbot.model.Point;
+import ggsbot.model.data.Point;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.List;
 
+@Service
 public class KmlService {
 
     private static final String KML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><kml xmlns=\"http://earth.google.com/kml/2.0\">\"" +

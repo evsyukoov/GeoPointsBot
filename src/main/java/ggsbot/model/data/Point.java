@@ -1,4 +1,4 @@
-package ggsbot.model;
+package ggsbot.model.data;
 
 import javax.persistence.*;
 

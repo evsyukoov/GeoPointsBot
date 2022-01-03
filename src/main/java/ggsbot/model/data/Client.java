@@ -1,4 +1,6 @@
-package ggsbot.model;
+package ggsbot.model.data;
+
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
@@ -13,10 +15,10 @@ public class Client {
     @Column(name="state")
     private int state;
 
-    @Column(name="usage")
-    private int usage;
+    @Column(name="count")
+    private int count;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn(name="id", referencedColumnName = "id")
     private Settings settings;
 
@@ -36,12 +38,12 @@ public class Client {
         this.state = state;
     }
 
-    public int getUsage() {
-        return usage;
+    public int getCount() {
+        return count;
     }
 
-    public void setUsage(int usage) {
-        this.usage = usage;
+    public void setCount(int count) {
+        this.count = count;
     }
 
     public Settings getSettings() {

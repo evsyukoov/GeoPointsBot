@@ -1,11 +1,12 @@
 package ggsbot.service;
 
-import ggsbot.model.Point;
-import ggsbot.utils.Utils;
+import ggsbot.model.data.Point;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class FilterPointService {
 
     //для тестов, будет тянуться с пользоваиельских настроек

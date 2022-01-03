@@ -1,4 +1,4 @@
-package ggsbot.model;
+package ggsbot.model.data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,8 +16,8 @@ public class Settings {
     @Column(name="radius")
     private int radius;
 
-    @Column(name="class")
-    private int pointClass;
+    @Column(name="classes")
+    private String pointClasses;
 
     public long getId() {
         return id;
@@ -35,11 +35,11 @@ public class Settings {
         this.radius = radius;
     }
 
-    public int getPointClass() {
-        return pointClass;
+    public String getPointClasses() {
+        return pointClasses;
     }
 
-    public void setPointClass(int pointClass) {
-        this.pointClass = pointClass;
+    public void setPointClasses(String pointClasses) {
+        this.pointClasses = pointClasses;
     }
 }

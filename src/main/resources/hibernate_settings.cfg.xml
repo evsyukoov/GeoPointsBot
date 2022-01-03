@@ -21,9 +21,9 @@
         <property name="hibernate.connection.characterEncoding">utf8</property>
         <property name="hibernate.connection.useUnicode">true</property>
 
-        <mapping class="ggsbot.model.Point" />
-        <mapping class="ggsbot.model.Client" />
-        <mapping class="ggsbot.model.Settings" />
+        <mapping class="ggsbot.model.data.Point" />
+        <mapping class="ggsbot.model.data.Client" />
+        <mapping class="ggsbot.model.data.Settings" />
 
 
     </session-factory>

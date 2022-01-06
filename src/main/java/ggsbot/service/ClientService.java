@@ -70,9 +70,7 @@ public class ClientService {
         settings.setRadius(defaultRadius);
         settings.setPointClasses(String.join(",", pointClasses));
         settings.setId(id);
-        settings.setFileFormats(Arrays.stream(FileFormat.values())
-                .map(FileFormat::name)
-                .collect(Collectors.joining(",")));
+        settings.setFileFormats(FileFormat.toStr());
         client.setSettings(settings);
         clientDao.saveClient(client);
         return client;

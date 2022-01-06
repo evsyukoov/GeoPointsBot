@@ -18,4 +18,8 @@ public class Messages {
 
     public static final String DEFAULT = "⚙️ Сбросить к заводским";
 
+    public static final String SETTINGS_APPROVE = "Настройки применены";
+
+    public static final String SETTINGS_DEFAULT = "Настройки сброшены к заводским";
+
 }

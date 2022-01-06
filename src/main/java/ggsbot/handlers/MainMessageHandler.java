@@ -4,6 +4,7 @@ import ggsbot.constants.Messages;
 import ggsbot.model.data.Client;
 import ggsbot.service.ClientService;
 import ggsbot.states.BotStateFactory;
+import ggsbot.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
@@ -28,7 +29,7 @@ public class MainMessageHandler {
     }
 
     public List<PartialBotApiMethod<?>> handleMessage(Update update) {
-        long id = update.getMessage().getChatId();
+        long id = getChatId(update);
         Client client = clientService.getClient(id);
         if (isStartMessage(update)) {
             clientService.moveClientToStart(client);
@@ -46,11 +47,15 @@ public class MainMessageHandler {
     }
 
     private SendMessage initStartMessage(Client client) {
-        return SendMessage.builder()
-                .chatId(String.valueOf(client.getId()))
-                .text(Messages.SEND_LOCATION)
-                .replyMarkup(initReplyKeyboardMarkup())
-                .build();
+        return Utils.initSendMessage(client, Messages.SEND_LOCATION, initReplyKeyboardMarkup());
+    }
+
+    private long getChatId(Update update) {
+        if (update.getMessage() != null) {
+            return update.getMessage().getChatId();
+        } else {
+            return update.getCallbackQuery().getMessage().getChatId();
+        }
     }
 
     private ReplyKeyboardMarkup initReplyKeyboardMarkup() {

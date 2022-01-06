@@ -19,6 +19,9 @@ public class Settings {
     @Column(name="classes")
     private String pointClasses;
 
+    @Column(name="file_formats")
+    private String fileFormats;
+
     public long getId() {
         return id;
     }
@@ -41,5 +44,13 @@ public class Settings {
 
     public void setPointClasses(String pointClasses) {
         this.pointClasses = pointClasses;
+    }
+
+    public void setFileFormats(String fileFormats) {
+        this.fileFormats = fileFormats;
+    }
+
+    public String getFileFormats() {
+        return fileFormats;
     }
 }

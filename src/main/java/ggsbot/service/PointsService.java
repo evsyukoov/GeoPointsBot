@@ -1,16 +1,31 @@
 package ggsbot.service;
 
+import ggsbot.model.access.PointDao;
 import ggsbot.model.data.Point;
+import ggsbot.utils.Utils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class FilterPointService {
+public class PointsService {
 
-    //для тестов, будет тянуться с пользоваиельских настроек
+    private final PointDao pointDao;
+
     public static final double radius = 20;
+
+    @Autowired
+    public PointsService(PointDao pointDao) {
+        this.pointDao = pointDao;
+    }
+
+    public List<Point> getPoints(double lat, double lon) {
+        int zone = Utils.findZone(lon);
+        List<Point> points = pointDao.getAllPointsByZone(zone);
+        return filterPoints(points, lat, lon);
+    }
 
     public List<Point> filterPoints(List<Point> list, double lat, double lon) {
         List<Point> res = list.stream()

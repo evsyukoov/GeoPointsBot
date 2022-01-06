@@ -1,0 +1,74 @@
+package ggsbot.bot;
+
+import ggsbot.controller.MainController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.bots.TelegramWebhookBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
+import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.List;
+
+@Component
+public class GeoPointBot extends TelegramWebhookBot {
+
+    private static final Logger logger = LoggerFactory.getLogger(GeoPointBot.class);
+
+    private String token;
+
+    private String userName;
+
+    @Value("${bot.token}")
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Value("${bot.name}")
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    @Override
+    public String getBotUsername() {
+        return userName;
+    }
+
+    @Override
+    public String getBotToken() {
+        return token;
+    }
+
+    @Override
+    public BotApiMethod<?> onWebhookUpdateReceived(Update update) {
+        return null;
+    }
+
+    @Override
+    public String getBotPath() {
+        return null;
+    }
+
+    public void sendAnswer(List<PartialBotApiMethod<?>> answer) {
+        answer.forEach(send -> {
+            try {
+                if (send instanceof SendMessage) {
+                    this.execute((SendMessage)send);
+                } else if (send instanceof SendDocument) {
+                    this.execute((SendDocument) send);
+                } else if (send instanceof EditMessageReplyMarkup) {
+                    this.execute((EditMessageReplyMarkup) send);
+                }
+            } catch (TelegramApiException e) {
+                logger.info("Failed to send answer {}", send);
+            }
+        });
+    }
+}

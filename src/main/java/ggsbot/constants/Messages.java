@@ -22,4 +22,8 @@ public class Messages {
 
     public static final String SETTINGS_DEFAULT = "Настройки сброшены к заводским";
 
+    public static final String FILES_READY = "Файлы сформированы";
+
+    public static final String POINTS_NOT_FOUND = "Не найдено ни одной точки в заданном радиусе";
+
 }

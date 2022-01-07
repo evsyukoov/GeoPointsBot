@@ -44,6 +44,16 @@ public class ClientService {
         return client;
     }
 
+    public void updateSettings(Client client, Settings settings) {
+        client.setSettings(settings);
+        clientDao.updateClient(client);
+    }
+
+    public void defaultSettings(Client client) {
+        client.setSettings(initDefaultSettings(client.getId()));
+        clientDao.updateClient(client);
+    }
+
     public void incrementClientState(Client client) {
         client.setState(client.getState() + 1);
         clientDao.updateClient(client);
@@ -66,14 +76,18 @@ public class ClientService {
         client.setId(id);
         client.setState(0);
         client.setCount(0);
+        client.setSettings(initDefaultSettings(id));
+        clientDao.saveClient(client);
+        return client;
+    }
+
+    private Settings initDefaultSettings(long id) {
         Settings settings = new Settings();
         settings.setRadius(defaultRadius);
         settings.setPointClasses(String.join(",", pointClasses));
         settings.setId(id);
         settings.setFileFormats(FileFormat.toStr());
-        client.setSettings(settings);
-        clientDao.saveClient(client);
-        return client;
+        return settings;
     }
 
     public int getSavedPointRadius(Client client) {

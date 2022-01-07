@@ -1,53 +1,45 @@
 package ggsbot.states;
 
 import ggsbot.constants.Messages;
-import ggsbot.model.access.PointDao;
 import ggsbot.model.data.Client;
 import ggsbot.model.data.Point;
 import ggsbot.service.ClientService;
-import ggsbot.service.KmlService;
+import ggsbot.service.FileService;
 import ggsbot.service.PointsService;
-import ggsbot.service.SettingsService;
+import ggsbot.service.SettingsKeyboardService;
 import ggsbot.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
-import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Location;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class LocationBotState implements BotState{
 
     private final PointsService pointsService;
 
-    private final KmlService kmlService;
+    private final FileService fileService;
 
     private final ClientService clientService;
 
-    private final SettingsService settingsService;
+    private final SettingsKeyboardService settingsKeyboardService;
 
     @Autowired
-    public LocationBotState(PointsService pointsService, KmlService kmlService,
-                            ClientService clientService, SettingsService settingsService) {
+    public LocationBotState(PointsService pointsService, FileService fileService,
+                            ClientService clientService, SettingsKeyboardService settingsKeyboardService) {
         this.pointsService = pointsService;
-        this.kmlService = kmlService;
+        this.fileService = fileService;
         this.clientService = clientService;
-        this.settingsService = settingsService;
+        this.settingsKeyboardService = settingsKeyboardService;
     }
 
     @Override
@@ -59,17 +51,23 @@ public class LocationBotState implements BotState{
     public List<PartialBotApiMethod<?>> handleMessage(Client client, Update update) {
         if (isLocationReceived(update)) {
             Location location = update.getMessage().getLocation();
-            List<Point> points = pointsService.getPoints(location.getLatitude(), location.getLongitude());
-            File file = new File(String.format("files/GGS_%s_%s.kml", client.getId(), Utils.getCurrentDateTime()));
+            List<Point> points = pointsService.getPoints(location.getLatitude(), location.getLongitude(), client);
             try {
-                kmlService.formKml(points, file);
-                return List.of(initSendDocument(file, client));
+                if (!points.isEmpty()) {
+                    List<PartialBotApiMethod<?>> result = fileService.formFiles(points, client)
+                            .stream()
+                            .map(f -> initSendDocument(f, client))
+                            .collect(Collectors.toList());
+                    result.add(Utils.initStartMessage(client, Messages.FILES_READY, Messages.SEND_LOCATION));
+                    return result;
+                }
+                return List.of(Utils.initStartMessage(client, Messages.POINTS_NOT_FOUND, Messages.SEND_LOCATION));
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (isSettingsReceived(update)) {
             clientService.incrementClientState(client);
-            return List.of(settingsService.initInlineKeyboard(client));
+            return List.of(settingsKeyboardService.initInlineKeyboard(client));
         }
         return Collections.emptyList();
     }
@@ -86,7 +84,7 @@ public class LocationBotState implements BotState{
     private SendDocument initSendDocument(File file, Client client) {
         return SendDocument.builder()
                 .chatId(String.valueOf(client.getId()))
-                .document(new InputFile(file))
+                .document(new InputFile(file, Utils.getResultFileName(file)))
                 .build();
 
     }

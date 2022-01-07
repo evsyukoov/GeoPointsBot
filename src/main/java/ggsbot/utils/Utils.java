@@ -6,11 +6,15 @@ import ggsbot.states.State;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -24,9 +28,17 @@ public class Utils {
         return State.values()[stateFromBd];
     }
 
-    public static String getCurrentDateTime() {
+    public static String getResultFileName(File file) {
+        return "GGS_" + getCurrentDateTime() + getExtension(file);
+    }
+    private static String getCurrentDateTime() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
         return dtf.format(LocalDateTime.now());
+    }
+
+    private static String  getExtension(File file) {
+        String fileName = file.getName();
+        return fileName.substring(fileName.indexOf("."));
     }
 
     public static <T extends CharSequence> String collectionToString(List<T> list) {
@@ -50,6 +62,29 @@ public class Utils {
                 .text(msg)
                 .replyMarkup(markup)
                 .build();
+    }
+
+    public static SendMessage initStartMessage(Client client) {
+        return Utils.initSendMessage(client, Messages.SEND_LOCATION, initReplyKeyboardMarkup());
+    }
+
+    public static SendMessage initStartMessage(Client client, String ... messages) {
+        return Utils.initSendMessage(client,
+                String.join("\n", Arrays.asList(messages)),
+                initReplyKeyboardMarkup());
+    }
+
+    private static ReplyKeyboardMarkup initReplyKeyboardMarkup() {
+        ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
+        KeyboardRow keyboardRow = new KeyboardRow();
+        KeyboardButton button = new KeyboardButton();
+        button.setText(Messages.SETTINGS);
+        List<KeyboardRow> keyboardRows = List.of(keyboardRow);
+        keyboardRow.add(button);
+        markup.setKeyboard(keyboardRows);
+        markup.setOneTimeKeyboard(true);
+        markup.setResizeKeyboard(true);
+        return markup;
     }
 
 }

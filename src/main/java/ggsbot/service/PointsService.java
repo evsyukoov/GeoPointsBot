@@ -1,6 +1,7 @@
 package ggsbot.service;
 
 import ggsbot.model.access.PointDao;
+import ggsbot.model.data.Client;
 import ggsbot.model.data.Point;
 import ggsbot.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,24 +15,27 @@ public class PointsService {
 
     private final PointDao pointDao;
 
-    public static final double radius = 20;
+    private final ClientService clientService;
 
     @Autowired
-    public PointsService(PointDao pointDao) {
+    public PointsService(PointDao pointDao, ClientService clientService) {
         this.pointDao = pointDao;
+        this.clientService = clientService;
     }
 
-    public List<Point> getPoints(double lat, double lon) {
+    public List<Point> getPoints(double lat, double lon, Client client) {
         int zone = Utils.findZone(lon);
         List<Point> points = pointDao.getAllPointsByZone(zone);
-        return filterPoints(points, lat, lon);
+        return filterPoints(points, lat, lon, client);
     }
 
-    public List<Point> filterPoints(List<Point> list, double lat, double lon) {
-        List<Point> res = list.stream()
+    private List<Point> filterPoints(List<Point> list, double lat, double lon, Client client) {
+        int radius = clientService.getSavedPointRadius(client);
+        List<String> pointClasses = clientService.getSavedClientPointClasses(client);
+        return list.stream()
                 .filter(p -> getDist(lat, lon, p.getLat(), p.getLon()) <= radius)
+                .filter(p -> pointClasses.contains(p.getPointClass()))
                 .collect(Collectors.toList());
-        return res;
     }
 
     private double getDist(double lat1, double lon1, double lat2, double lon2)

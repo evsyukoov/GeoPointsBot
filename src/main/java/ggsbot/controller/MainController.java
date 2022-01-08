@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.util.List;
 
 @RestController
 public class MainController {
@@ -37,7 +40,9 @@ public class MainController {
     public void processRequest(@RequestBody Update update) {
         try {
             logger.info("Request from telegram {}", objectMapper.writeValueAsString(update));
-            geoPointBot.sendAnswer(handler.handleMessage(update));
+            List<PartialBotApiMethod<?>> answer = handler.handleMessage(update);
+            geoPointBot.sendAnswer(answer);
+            logger.info("Answer is sending to client {}", objectMapper.writeValueAsString(answer));
         } catch (Exception e) {
             logger.error("Непредвиденная ошибка: ", e);
         }

@@ -99,24 +99,17 @@
             <version>5.5.7.Final</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path -->
+        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-c3p0 -->
         <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
-            <version>2.6.0</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-c3p0</artifactId>
+            <version>5.5.7.Final</version>
         </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.20</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.11.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.telegram/telegrambots -->

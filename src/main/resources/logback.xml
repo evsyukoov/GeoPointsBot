@@ -9,13 +9,13 @@
         </encoder>
     </appender>
 
-    <appender name="FILE"
-              class="ch.qos.logback.core.FileAppender">
-        <file>app/errors.log</file>
-        <encoder>
-            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level  %logger{20} - %msg%n</pattern>
-        </encoder>
-    </appender>
+<!--    <appender name="FILE"-->
+<!--              class="ch.qos.logback.core.FileAppender">-->
+<!--        <file>app/errors.log</file>-->
+<!--        <encoder>-->
+<!--            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level  %logger{20} - %msg%n</pattern>-->
+<!--        </encoder>-->
+<!--    </appender>-->
 
     <appender name="FILE_ROLLING"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -31,13 +31,9 @@
         </encoder>
     </appender>
 
-    <logger name="ggsbot" level="ERROR">
-        <appender-ref ref="FILE" />
-    </logger>
-
-    <root level="INFO">
+    <logger name="ggsbot" level="INFO" >
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE_ROLLING" />
-    </root>
+    </logger>
 
 </configuration>

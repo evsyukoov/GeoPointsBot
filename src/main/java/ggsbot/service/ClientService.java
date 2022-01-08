@@ -7,10 +7,11 @@ import ggsbot.model.data.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.objects.Chat;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ClientService {
@@ -36,12 +37,31 @@ public class ClientService {
         this.clientDao = clientDao;
     }
 
-    public Client getClient(long id) {
+    public Client getClient(Update update) {
         Client client;
+        long id = getId(update);
         if ((client = clientDao.getClient(id)) == null) {
-            return initDefaultClient(id);
+            return initDefaultClient(id, getName(update), getNickName(update));
         }
         return client;
+    }
+
+    private long getId(Update update) {
+        if (update.getMessage() != null) {
+            return update.getMessage().getChatId();
+        } else {
+            return update.getCallbackQuery().getMessage().getChatId();
+        }
+    }
+
+    private String getName(Update update) {
+        Chat chat = update.getMessage().getChat();
+        return chat.getFirstName()
+                + (chat.getLastName() == null ? "" : (" " + chat.getLastName()));
+    }
+
+    private String getNickName(Update update) {
+        return update.getMessage().getChat().getUserName();
     }
 
     public void updateSettings(Client client, Settings settings) {
@@ -60,7 +80,7 @@ public class ClientService {
     }
 
     public void incrementCount(Client client) {
-        client.setState(client.getCount() + 1);
+        client.setCount(client.getCount() + 1);
         clientDao.updateClient(client);
     }
 
@@ -71,11 +91,13 @@ public class ClientService {
         }
     }
 
-    private Client initDefaultClient(long id) {
+    private Client initDefaultClient(long id, String name, String nickName) {
         Client client = new Client();
         client.setId(id);
         client.setState(0);
         client.setCount(0);
+        client.setName(name);
+        client.setNickName(nickName);
         client.setSettings(initDefaultSettings(id));
         clientDao.saveClient(client);
         return client;

@@ -1,6 +1,5 @@
 package ggsbot.bot;
 
-import ggsbot.controller.MainController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +8,6 @@ import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
-import org.telegram.telegrambots.meta.api.methods.send.SendLocation;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -67,7 +65,7 @@ public class GeoPointBot extends TelegramWebhookBot {
                     this.execute((EditMessageReplyMarkup) send);
                 }
             } catch (TelegramApiException e) {
-                logger.info("Failed to send answer {}", send);
+                logger.error("Failed to send answer {}", send);
             }
         });
     }

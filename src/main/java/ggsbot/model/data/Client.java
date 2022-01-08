@@ -18,6 +18,12 @@ public class Client {
     @Column(name="count")
     private int count;
 
+    @Column(name="name")
+    private String name;
+
+    @Column(name="nickname")
+    private String nickName;
+
     @OneToOne(cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn(name="id", referencedColumnName = "id")
     private Settings settings;
@@ -52,5 +58,21 @@ public class Client {
 
     public void setSettings(Settings settings) {
         this.settings = settings;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 }

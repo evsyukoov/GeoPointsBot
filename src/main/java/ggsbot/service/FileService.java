@@ -24,6 +24,10 @@ public class FileService {
             "<Document><Style id=\"z1\"><IconStyle><scale>1.2</scale><color>ffFFFFFF</color><Icon>" +
             "<href>http://maps.google.com/mapfiles/kml/shapes/triangle.png</href></Icon></IconStyle></Style>\n";
 
+    private static final String GPX_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gpx\nxmlns=\"http://www.topografix.com/GPX/1/1\"" +
+            "\nversion=\"1.1\"\ncreator=\"InjGeo_bot\"\nxmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+            "xsi:schemaLocation=\"http://www.garmin.com/xmlschemas/WaypointExtension/v1 \">\n";
+
     public List<File> formFiles(List<Point> points, Client client) throws IOException {
         List<File> outputFiles = new ArrayList<>();
         List<String> formats = clientService.getSavedClientFileFormats(client);
@@ -35,7 +39,9 @@ public class FileService {
                 formKml(points, file);
             }
             if (fileFormat == FileFormat.GPX) {
-
+                File file = new File(String.format("files/%s.gpx", client.getId()));
+                outputFiles.add(file);
+                formGpx(points, file);
             }
         }
         return outputFiles;
@@ -45,14 +51,29 @@ public class FileService {
         try (Writer kml = new OutputStreamWriter(new FileOutputStream(file))) {
             kml.write(KML_HEADER);
             for (Point p : points) {
-                kml.write(String.format("<Placemark><name>%s</name><description>Class: %s, Mark: %s, Center-type: %s</description><stileUrl>#z1</stileUrl>" +
-                                "<Point><coordinates>%s,%s,%d</coordinates></Point></Placemark>\r\n", p.getName(), p.getPointClass(),
-                        p.getMark() == null ? "-" : p.getMark(), p.getCenterType() == null ? "-" : p.getCenterType(),
+                kml.write(String.format("<Placemark><name>%s</name><description>%s</description><stileUrl>#z1</stileUrl>" +
+                                "<Point><coordinates>%s,%s,%d</coordinates></Point></Placemark>\r\n", p.getName(),
+                        getDescription(p),
                         p.getLon(), p.getLat(), 0));
             }
             kml.write("</Document>\n</kml>");
         }
+    }
 
+    private void formGpx(List<Point> points, File file) throws IOException {
+        try (Writer gpx = new OutputStreamWriter(new FileOutputStream(file))) {
+            gpx.write(GPX_HEADER);
+            for (Point p : points) {
+                gpx.write(String.format("<wpt lat=\"%s\" lon=\"%s\"><name>%s</name><desc>%s</desc></wpt>\n", p.getLat(), p.getLon(), p.getName(),
+                        getDescription(p)));
+            }
+            gpx.write("</gpx>");
+        }
+    }
+
+    private String getDescription(Point p) {
+        return String.format("Class: %s, Mark: %s, Center-type: %s", p.getPointClass(),
+                p.getMark() == null ? "-" : p.getMark(), p.getCenterType() == null ? "-" : p.getCenterType());
     }
 
 }

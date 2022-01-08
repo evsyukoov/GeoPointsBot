@@ -4,7 +4,6 @@ import ggsbot.constants.Messages;
 import ggsbot.model.data.Client;
 import ggsbot.states.State;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -31,6 +29,7 @@ public class Utils {
     public static String getResultFileName(File file) {
         return "GGS_" + getCurrentDateTime() + getExtension(file);
     }
+
     private static String getCurrentDateTime() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH-mm-ss");
         return dtf.format(LocalDateTime.now());
@@ -43,17 +42,6 @@ public class Utils {
 
     public static <T extends CharSequence> String collectionToString(List<T> list) {
         return String.join(",", list);
-    }
-
-    public static List<?> stringToCollection(String str) {
-        return Arrays.asList(str.split(","));
-    }
-
-    public static SendMessage initSendMessage(Client client, String msg) {
-        return SendMessage.builder()
-                .chatId(String.valueOf(client.getId()))
-                .text(msg)
-                .build();
     }
 
     public static SendMessage initSendMessage(Client client, String msg, ReplyKeyboardMarkup markup) {

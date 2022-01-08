@@ -1,6 +1,7 @@
 package ggsbot.model.access;
 
 import ggsbot.model.data.Point;
+import org.checkerframework.framework.qual.Unused;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -21,35 +22,8 @@ public class PointDao {
                 .buildSessionFactory();
     }
 
-    public void savePoints(List<Point> points) {
-        try(Session session = factory.getCurrentSession()) {
-            session.beginTransaction();
-            points.forEach(p -> session.save(p));
-            session.getTransaction().commit();
-        }
-    }
-
-    public void updatePoints(List<Point> points) {
-        try(Session session = factory.getCurrentSession()) {
-            session.beginTransaction();
-            points.forEach(session::update);
-            session.getTransaction().commit();
-        }
-    }
-
-    public List<Point> getAllPoints() {
-        List<Point> points = new ArrayList<>();
-        try(Session session = factory.getCurrentSession()) {
-            session.beginTransaction();
-            Query<Point> query = session.createQuery("FROM Point", Point.class);
-            points = query.list();
-            session.getTransaction().commit();
-        }
-        return points;
-    }
-
     public List<Point> getAllPointsByZone(int zone) {
-        List<Point> points = new ArrayList<>();
+        List<Point> points;
         try(Session session = factory.getCurrentSession()) {
             session.beginTransaction();
             Query<Point> query = session.createQuery("FROM Point WHERE zone =: zone", Point.class);

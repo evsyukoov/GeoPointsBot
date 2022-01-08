@@ -1,10 +1,7 @@
 package ggsbot.controller;
 
-import ch.qos.logback.classic.LoggerContext;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ggsbot.bot.GeoPointBot;
-import ggsbot.config.Config;
 import ggsbot.handlers.MainMessageHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +34,12 @@ public class MainController {
     private String token;
 
     @PostMapping(path = "/updates/v1/{token}")
-    public void processRequest(@RequestBody Update update) throws JsonProcessingException {
+    public void processRequest(@RequestBody Update update) {
         try {
             logger.info("Request from telegram {}", objectMapper.writeValueAsString(update));
             geoPointBot.sendAnswer(handler.handleMessage(update));
         } catch (Exception e) {
-            System.out.println("exc");
+            logger.error("Непредвиденная ошибка: ", e);
         }
     }
 

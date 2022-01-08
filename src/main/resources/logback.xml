@@ -11,21 +11,33 @@
 
     <appender name="FILE"
               class="ch.qos.logback.core.FileAppender">
-        <file>app/bot_logging.log</file>
+        <file>app/errors.log</file>
         <encoder>
             <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level  %logger{20} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="ggsbot.config.Config" level="INFO">
+    <appender name="FILE_ROLLING"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>app/bot.log</file>
+        <rollingPolicy
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>app/bot.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>100MB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} [%thread] %-5level  %logger{20} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="ggsbot" level="ERROR">
         <appender-ref ref="FILE" />
     </logger>
 
-    <logger name="ggsbot.controller.MainController" level="INFO">
-        <appender-ref ref="FILE" />
-    </logger>
-
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE_ROLLING" />
     </root>
+
 </configuration>

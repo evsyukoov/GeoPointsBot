@@ -24,8 +24,7 @@ public class MainMessageHandler {
     }
 
     public List<PartialBotApiMethod<?>> handleMessage(Update update) {
-        long id = getChatId(update);
-        Client client = clientService.getClient(id);
+        Client client = clientService.getClient(update);
         if (isStartMessage(update)) {
             clientService.moveClientToStart(client);
             return Collections.singletonList(Utils.initStartMessage(client));
@@ -39,14 +38,6 @@ public class MainMessageHandler {
         return update.getMessage() != null
                 && update.getMessage().getText() != null
                 && update.getMessage().getText().equals(Messages.START);
-    }
-
-    private long getChatId(Update update) {
-        if (update.getMessage() != null) {
-            return update.getMessage().getChatId();
-        } else {
-            return update.getCallbackQuery().getMessage().getChatId();
-        }
     }
 
 }

@@ -8,6 +8,8 @@ import ggsbot.service.FileService;
 import ggsbot.service.PointsService;
 import ggsbot.service.SettingsKeyboardService;
 import ggsbot.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
@@ -24,6 +26,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class LocationBotState implements BotState{
+
+    private static final Logger logger = LoggerFactory.getLogger(LocationBotState.class);
 
     private final PointsService pointsService;
 
@@ -53,6 +57,7 @@ public class LocationBotState implements BotState{
             Location location = update.getMessage().getLocation();
             List<Point> points = pointsService.getPoints(location.getLatitude(), location.getLongitude(), client);
             try {
+                clientService.incrementCount(client);
                 if (!points.isEmpty()) {
                     List<PartialBotApiMethod<?>> result = fileService.formFiles(points, client)
                             .stream()
@@ -63,7 +68,7 @@ public class LocationBotState implements BotState{
                 }
                 return List.of(Utils.initStartMessage(client, Messages.POINTS_NOT_FOUND, Messages.SEND_LOCATION));
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Проблемы при формировании файлов", e);
             }
         } else if (isSettingsReceived(update)) {
             clientService.incrementClientState(client);

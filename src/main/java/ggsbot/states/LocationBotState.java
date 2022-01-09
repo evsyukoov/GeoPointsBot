@@ -1,6 +1,7 @@
 package ggsbot.states;
 
 import ggsbot.constants.Messages;
+import ggsbot.handlers.Coordinate;
 import ggsbot.model.data.Client;
 import ggsbot.model.data.Point;
 import ggsbot.service.ClientService;
@@ -53,9 +54,14 @@ public class LocationBotState implements BotState{
 
     @Override
     public List<PartialBotApiMethod<?>> handleMessage(Client client, Update update) {
-        if (isLocationReceived(update)) {
-            Location location = update.getMessage().getLocation();
-            List<Point> points = pointsService.getPoints(location.getLatitude(), location.getLongitude(), client);
+        if (isLocationReceived(update) || isCoordinatesReceived(update)) {
+            Coordinate coordinate;
+            try {
+                coordinate = getCoord(update);
+            } catch (RuntimeException e) {
+                return Collections.emptyList();
+            }
+            List<Point> points = pointsService.getPoints(coordinate.getLat(), coordinate.getLon(), client);
             try {
                 clientService.incrementCount(client);
                 if (!points.isEmpty()) {
@@ -79,6 +85,26 @@ public class LocationBotState implements BotState{
 
     private boolean isLocationReceived(Update update) {
         return update.getMessage() != null && update.getMessage().getLocation() != null;
+    }
+
+    private boolean isCoordinatesReceived(Update update) {
+        return update.getMessage() != null && update.getMessage().getText() != null;
+    }
+
+    private Coordinate getCoord(Update update) {
+        Coordinate coordinate = new Coordinate();
+        if (isCoordinatesReceived(update)) {
+            String[] arr = update.getMessage().getText().split(";");
+            if (arr.length != 2) {
+                throw new RuntimeException();
+            }
+            coordinate.setLat(Double.parseDouble(arr[0]));
+            coordinate.setLon(Double.parseDouble(arr[1]));
+        } else {
+            coordinate.setLon(update.getMessage().getLocation().getLongitude());
+            coordinate.setLat(update.getMessage().getLocation().getLongitude());
+        }
+        return coordinate;
     }
 
     private boolean isSettingsReceived(Update update) {

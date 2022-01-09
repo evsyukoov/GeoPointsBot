@@ -76,6 +76,7 @@ public class Config {
             ResponseEntity<Object> resp = new RestTemplate().getForEntity(
                     generateWebhookUrl(prodHost, prodPort),
                     Object.class);
+            
             logger.info("Set Prod-webhook, response - {}", mapper.writeValueAsString(resp));
         }
     }

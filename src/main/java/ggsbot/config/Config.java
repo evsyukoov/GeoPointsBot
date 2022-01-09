@@ -37,12 +37,12 @@ public class Config {
         this.mapper = new ObjectMapper();
     }
 
-    @Value("${bot.prod.host}")
+    @Value("${nginx.prod.host}")
     public void setProdHost(String prodHost) {
         this.prodHost = prodHost;
     }
 
-    @Value("${bot.prod.port")
+    @Value("${nginx.prod.port}")
     public void setProdPort(String prodPort) {
         this.prodPort = prodPort;
     }

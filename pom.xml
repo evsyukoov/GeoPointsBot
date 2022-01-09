@@ -36,7 +36,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <fork>true</fork>
-                    <mainClass>ggsbot.Main</mainClass>
+                    <mainClass>ggsbot.Application</mainClass>
                 </configuration>
                 <executions>
                     <execution>

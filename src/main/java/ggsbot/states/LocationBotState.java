@@ -101,8 +101,8 @@ public class LocationBotState implements BotState{
             coordinate.setLat(Double.parseDouble(arr[0]));
             coordinate.setLon(Double.parseDouble(arr[1]));
         } else {
+            coordinate.setLat(update.getMessage().getLocation().getLatitude());
             coordinate.setLon(update.getMessage().getLocation().getLongitude());
-            coordinate.setLat(update.getMessage().getLocation().getLongitude());
         }
         return coordinate;
     }

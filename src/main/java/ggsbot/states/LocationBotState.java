@@ -88,7 +88,8 @@ public class LocationBotState implements BotState{
     }
 
     private boolean isCoordinatesReceived(Update update) {
-        return update.getMessage() != null && update.getMessage().getText() != null;
+        return update.getMessage() != null && update.getMessage().getText() != null &&
+                update.getMessage().getText().equals(Messages.SETTINGS);
     }
 
     private Coordinate getCoord(Update update) {

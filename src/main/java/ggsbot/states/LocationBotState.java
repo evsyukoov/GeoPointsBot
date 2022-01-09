@@ -89,7 +89,7 @@ public class LocationBotState implements BotState{
 
     private boolean isCoordinatesReceived(Update update) {
         return update.getMessage() != null && update.getMessage().getText() != null &&
-                update.getMessage().getText().equals(Messages.SETTINGS);
+                !update.getMessage().getText().equals(Messages.SETTINGS);
     }
 
     private Coordinate getCoord(Update update) {
@@ -99,8 +99,8 @@ public class LocationBotState implements BotState{
             if (arr.length != 2) {
                 throw new RuntimeException();
             }
-            coordinate.setLat(Double.parseDouble(arr[0]));
-            coordinate.setLon(Double.parseDouble(arr[1]));
+            coordinate.setLat(Double.parseDouble(arr[0].trim()));
+            coordinate.setLon(Double.parseDouble(arr[1].trim()));
         } else {
             coordinate.setLat(update.getMessage().getLocation().getLatitude());
             coordinate.setLon(update.getMessage().getLocation().getLongitude());

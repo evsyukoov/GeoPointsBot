@@ -9,9 +9,12 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import java.util.List;
 
@@ -54,19 +57,28 @@ public class GeoPointBot extends TelegramWebhookBot {
         return null;
     }
 
-    public void sendAnswer(List<PartialBotApiMethod<?>> answer) {
-        answer.forEach(send -> {
+    public void sendAnswer(List<PartialBotApiMethod<?>> answer) throws TelegramApiException {
+        for (PartialBotApiMethod<?> send : answer) {
             try {
                 if (send instanceof SendMessage) {
-                    this.execute((SendMessage)send);
+                    this.execute((SendMessage) send);
                 } else if (send instanceof SendDocument) {
                     this.execute((SendDocument) send);
                 } else if (send instanceof EditMessageReplyMarkup) {
                     this.execute((EditMessageReplyMarkup) send);
+                } else if (send instanceof SendVideo) {
+                    this.execute((SendVideo) send);
                 }
             } catch (TelegramApiException e) {
-                logger.error("Failed to send answer {}", send);
+                // TODO ошибка может возникнуть, если клиент ничего не изменил в настройках,
+                //  тогда отправка EditMessageReplyMarkup падает,
+                //  но ничего не ломается, в идеале добавить в SettingsKeyboardService проверку,
+                //  что клиент действительно что-то менял, чтобы не формировать лишний объект на отправку
+                if (e instanceof TelegramApiRequestException) {
+                    continue;
+                }
+                throw e;
             }
-        });
+        }
     }
 }

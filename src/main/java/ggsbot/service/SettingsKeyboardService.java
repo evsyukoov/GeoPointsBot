@@ -53,7 +53,7 @@ public class SettingsKeyboardService {
         return sm;
     }
 
-    public InlineKeyboardMarkup initKeyboardMarkup(Client client) {
+    private InlineKeyboardMarkup initKeyboardMarkup(Client client) {
         InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         initRadiusKeyBoard(rows, client);

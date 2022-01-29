@@ -6,6 +6,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class ClientDao {
     final private static SessionFactory factory;
@@ -40,5 +42,15 @@ public class ClientDao {
             session.getTransaction().commit();
         }
         return client;
+    }
+
+    public List<Client> getAllClients() {
+        List<Client> list;
+        try(Session session = factory.getCurrentSession()) {
+            session.beginTransaction();
+            list = session.createQuery("From Client", Client.class).list();
+            session.getTransaction().commit();
+        }
+        return list;
     }
 }

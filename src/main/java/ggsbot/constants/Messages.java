@@ -2,7 +2,7 @@ package ggsbot.constants;
 
 public class Messages {
 
-    public static final String SEND_LOCATION = "Отправьте геолокацию";
+    public static final String SEND_LOCATION = "Прикрепите геолокацию (или отправьте широта;долгота или поделитесь точкой из яндекс карт)";
 
     public static final String START = "/start";
 
@@ -26,4 +26,7 @@ public class Messages {
 
     public static final String POINTS_NOT_FOUND = "Не найдено ни одной точки в заданном радиусе";
 
+    public static final String UPDATE = "Небольшое обновление.\n" +
+            "Теперь ты можешь поделиться с ботом координатами из яндекс карт. \n" +
+            "Сейчас придет короткое видео о том, как это сделать";
 }

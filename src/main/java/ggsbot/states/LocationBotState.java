@@ -4,19 +4,16 @@ import ggsbot.constants.Messages;
 import ggsbot.handlers.Coordinate;
 import ggsbot.model.data.Client;
 import ggsbot.model.data.Point;
-import ggsbot.service.ClientService;
-import ggsbot.service.FileService;
-import ggsbot.service.PointsService;
-import ggsbot.service.SettingsKeyboardService;
+import ggsbot.service.*;
 import ggsbot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
-import org.telegram.telegrambots.meta.api.objects.Location;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.io.File;
@@ -38,13 +35,24 @@ public class LocationBotState implements BotState{
 
     private final SettingsKeyboardService settingsKeyboardService;
 
+    private final YandexMapService yandexMapService;
+
+    private String yandexMapLink;
+
+    @Value("${yandex.map.link}")
+    public void setYandexMapLink(String yandexMapLink) {
+        this.yandexMapLink = yandexMapLink;
+    }
+
     @Autowired
     public LocationBotState(PointsService pointsService, FileService fileService,
-                            ClientService clientService, SettingsKeyboardService settingsKeyboardService) {
+                            ClientService clientService, SettingsKeyboardService settingsKeyboardService,
+                            YandexMapService yandexMapService) {
         this.pointsService = pointsService;
         this.fileService = fileService;
         this.clientService = clientService;
         this.settingsKeyboardService = settingsKeyboardService;
+        this.yandexMapService = yandexMapService;
     }
 
     @Override
@@ -83,33 +91,51 @@ public class LocationBotState implements BotState{
         return Collections.emptyList();
     }
 
+    private boolean isTextInfoReceived(Update update) {
+        return update.getMessage() != null && update.getMessage().getText() != null;
+    }
+
     private boolean isLocationReceived(Update update) {
         return update.getMessage() != null && update.getMessage().getLocation() != null;
     }
 
     private boolean isCoordinatesReceived(Update update) {
-        return update.getMessage() != null && update.getMessage().getText() != null &&
+        return isTextInfoReceived(update) &&
                 !update.getMessage().getText().equals(Messages.SETTINGS);
+    }
+
+    private boolean isYandexMapLinkReceived(Update update) {
+        return update.getMessage().getText().contains(yandexMapLink);
     }
 
     private Coordinate getCoord(Update update) {
         Coordinate coordinate = new Coordinate();
         if (isCoordinatesReceived(update)) {
-            String[] arr = update.getMessage().getText().split(";");
-            if (arr.length != 2) {
-                throw new RuntimeException();
+            if (isYandexMapLinkReceived(update)) {
+                    return yandexMapService.getCoordsFromLink(update.getMessage().getText());
+            } else {
+                return parseCoordsFromText(update.getMessage().getText());
             }
-            coordinate.setLat(Double.parseDouble(arr[0].trim()));
-            coordinate.setLon(Double.parseDouble(arr[1].trim()));
-        } else {
+        } else if (isLocationReceived(update)) {
             coordinate.setLat(update.getMessage().getLocation().getLatitude());
             coordinate.setLon(update.getMessage().getLocation().getLongitude());
         }
         return coordinate;
     }
 
+    private Coordinate parseCoordsFromText(String text) {
+        Coordinate coordinate = new Coordinate();
+        String[] arr = text.split(";");
+        if (arr.length != 2) {
+            throw new RuntimeException();
+        }
+        coordinate.setLat(Double.parseDouble(arr[0].trim()));
+        coordinate.setLon(Double.parseDouble(arr[1].trim()));
+        return coordinate;
+    }
+
     private boolean isSettingsReceived(Update update) {
-        return update.getMessage() != null && update.getMessage().getText() != null &&
+        return isTextInfoReceived(update) &&
                 update.getMessage().getText().equals(Messages.SETTINGS);
     }
 

@@ -33,6 +33,13 @@ public class Config {
 
     private String prodPort;
 
+    private String serverLocalPort;
+
+    @Value("${server.port}")
+    public void setServerLocalPort(String serverLocalPort) {
+        this.serverLocalPort = serverLocalPort;
+    }
+
     public Config() {
         this.mapper = new ObjectMapper();
     }
@@ -94,7 +101,7 @@ public class Config {
     private String startNgrok() {
         final NgrokClient ngrokClient = new NgrokClient.Builder().build();
         final CreateTunnel createTunnel = new CreateTunnel.Builder()
-                .withAddr(8080)
+                .withAddr(serverLocalPort)
                 .build();
         final Tunnel httpTunnel = ngrokClient.connect(createTunnel);
         return httpTunnel.getPublicUrl();
@@ -113,5 +120,10 @@ public class Config {
         BooleanNode ok = (BooleanNode) node.at("/ok");
         TextNode url = (TextNode) node.at("/result/url");
         return ok.asBoolean() && url.asText().contains(prodHost);
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

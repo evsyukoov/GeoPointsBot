@@ -40,6 +40,8 @@ public class Updater1 {
 
     private static final Logger logger = LoggerFactory.getLogger(Updater1.class);
 
+    private static final Long WAIT = 10 * 1000L;
+
     @Autowired
     public Updater1(ClientDao clientDao, GeoPointBot geoPointBot, SettingsKeyboardService keyboardService) {
         this.clientDao = clientDao;
@@ -47,7 +49,7 @@ public class Updater1 {
         this.keyboardService = keyboardService;
     }
 
-    //@PostConstruct
+    @PostConstruct
     public void run() {
         new Thread(this::sendInfo).start();
     }
@@ -57,6 +59,7 @@ public class Updater1 {
         try {
             infoAboutUpdate = new ClassPathResource("updates/update-2022-01-29.mp4").getFile();
         } catch (IOException e) {
+            logger.error("No such file", e);
             return;
         }
         int i = 1;

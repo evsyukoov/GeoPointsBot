@@ -51,8 +51,10 @@ public class FileService {
         try (Writer kml = new OutputStreamWriter(new FileOutputStream(file))) {
             kml.write(KML_HEADER);
             for (Point p : points) {
-                kml.write(String.format("<Placemark><name>%s</name><description>%s</description><stileUrl>#z1</stileUrl>" +
-                                "<Point><coordinates>%s,%s,%d</coordinates></Point></Placemark>\r\n", p.getName(),
+                kml.write(String.format("<Placemark><name>%s%s</name><description>%s</description><stileUrl>#z1</stileUrl>" +
+                                "<Point><coordinates>%s,%s,%d</coordinates></Point></Placemark>\r\n",
+                        getPointClassPrefix(p.getPointClass()),
+                        p.getName(),
                         getDescription(p),
                         p.getLon(), p.getLat(), 0));
             }
@@ -64,16 +66,25 @@ public class FileService {
         try (Writer gpx = new OutputStreamWriter(new FileOutputStream(file))) {
             gpx.write(GPX_HEADER);
             for (Point p : points) {
-                gpx.write(String.format("<wpt lat=\"%s\" lon=\"%s\"><name>%s</name><desc>%s</desc></wpt>\n", p.getLat(), p.getLon(), p.getName(),
+                gpx.write(String.format("<wpt lat=\"%s\" lon=\"%s\"><name>%s%s</name><desc>%s</desc></wpt>\n", p.getLat(), p.getLon(),
+                        getPointClassPrefix(p.getPointClass()),
+                        p.getName(),
                         getDescription(p)));
             }
             gpx.write("</gpx>");
         }
     }
 
+    private String getPointClassPrefix(String s) {
+        return s.equals("Неизвестный") ? "" : (s + "_");
+    }
+
     private String getDescription(Point p) {
-        return String.format("Class: %s, Mark: %s, Center-type: %s", p.getPointClass(),
-                p.getMark() == null ? "-" : p.getMark(), p.getCenterType() == null ? "-" : p.getCenterType());
+        return String.format("Catalog number: %s, Class: %s, Mark: %s, Center-type: %s",
+                p.getIndex() == null ? "-" : p.getIndex(), // Крымский кейс
+                p.getPointClass(),
+                p.getMark() == null ? "-" : p.getMark(),
+                p.getCenterType() == null ? "-" : p.getCenterType());
     }
 
 }

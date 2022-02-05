@@ -1,6 +1,9 @@
 package ggsbot.states;
 
+import com.mchange.v2.cfg.PropertiesConfigSource;
 import ggsbot.constants.Messages;
+import ggsbot.errors.ParseCoordsException;
+import ggsbot.errors.YandexMapException;
 import ggsbot.handlers.Coordinate;
 import ggsbot.model.data.Client;
 import ggsbot.model.data.Point;
@@ -23,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class LocationBotState implements BotState{
+public class LocationBotState implements BotState {
 
     private static final Logger logger = LoggerFactory.getLogger(LocationBotState.class);
 
@@ -66,8 +69,8 @@ public class LocationBotState implements BotState{
             Coordinate coordinate;
             try {
                 coordinate = getCoord(update);
-            } catch (RuntimeException e) {
-                return Collections.emptyList();
+            } catch (Exception e) {
+                return processClientInputError(client, e);
             }
             List<Point> points = pointsService.getPoints(coordinate.getLat(), coordinate.getLon(), client);
             try {
@@ -77,18 +80,30 @@ public class LocationBotState implements BotState{
                             .stream()
                             .map(f -> initSendDocument(f, client))
                             .collect(Collectors.toList());
-                    result.add(Utils.initStartMessage(client, Messages.FILES_READY, Messages.SEND_LOCATION));
+                    result.add(Utils.initMessage(client, Messages.FILES_READY, Messages.SEND_LOCATION));
                     return result;
                 }
-                return List.of(Utils.initStartMessage(client, Messages.POINTS_NOT_FOUND, Messages.SEND_LOCATION));
+                return List.of(Utils.initMessage(client, Messages.POINTS_NOT_FOUND, Messages.SEND_LOCATION));
             } catch (IOException e) {
                 logger.error("Проблемы при формировании файлов", e);
             }
         } else if (isSettingsReceived(update)) {
             clientService.incrementClientState(client);
             return List.of(settingsKeyboardService.initInlineKeyboard(client));
+        } else {
+            return List.of(Utils.initMessage(client, Messages.INCORRECT_INPUT, Messages.SEND_LOCATION));
         }
         return Collections.emptyList();
+    }
+
+    private List<PartialBotApiMethod<?>> processClientInputError(Client client, Exception e) {
+        if (e instanceof ParseCoordsException) {
+            return List.of(Utils.initMessage(client, Messages.WRONG_TEXT_COORDS));
+        } else if (e instanceof YandexMapException) {
+            return List.of(Utils.initMessage(client, Messages.WRONG_YANDEX_MAP_LINK));
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private boolean isTextInfoReceived(Update update) {
@@ -112,7 +127,7 @@ public class LocationBotState implements BotState{
         Coordinate coordinate = new Coordinate();
         if (isCoordinatesReceived(update)) {
             if (isYandexMapLinkReceived(update)) {
-                    return yandexMapService.getCoordsFromLink(update.getMessage().getText());
+                return yandexMapService.getCoordsFromLink(update.getMessage().getText());
             } else {
                 return parseCoordsFromText(update.getMessage().getText());
             }
@@ -127,10 +142,14 @@ public class LocationBotState implements BotState{
         Coordinate coordinate = new Coordinate();
         String[] arr = text.split(";");
         if (arr.length != 2) {
-            throw new RuntimeException();
+            throw new ParseCoordsException();
         }
-        coordinate.setLat(Double.parseDouble(arr[0].trim()));
-        coordinate.setLon(Double.parseDouble(arr[1].trim()));
+        try {
+            coordinate.setLat(Double.parseDouble(arr[0].trim()));
+            coordinate.setLon(Double.parseDouble(arr[1].trim()));
+        } catch (Exception e) {
+            throw new ParseCoordsException();
+        }
         return coordinate;
     }
 

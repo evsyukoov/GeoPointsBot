@@ -41,7 +41,7 @@ public class SettingsBotState implements BotState {
                 if ((optionalSettings = settingsKeyboardService.setSettings(update, client)).isPresent()) {
                     clientService.updateSettings(client, optionalSettings.get());
                     clientService.moveClientToStart(client);
-                    return List.of(Utils.initStartMessage(client,
+                    return List.of(Utils.initMessage(client,
                             Messages.SETTINGS_APPROVE, Messages.SEND_LOCATION));
                 }
                 return Collections.emptyList();
@@ -49,9 +49,12 @@ public class SettingsBotState implements BotState {
                 clientService.defaultSettings(client);
                 clientService.moveClientToStart(client);
                 return List.of(settingsKeyboardService.refreshDefaultKeyboard(client, update),
-                                Utils.initStartMessage(client,
+                                Utils.initMessage(client,
                                         Messages.SETTINGS_DEFAULT, Messages.SEND_LOCATION));
             }
+        } else {
+            return List.of(Utils.initMessage(client, Messages.INCORRECT_INPUT_SETTINGS),
+                    settingsKeyboardService.initInlineKeyboard(client));
         }
         return Collections.emptyList();
     }

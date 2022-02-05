@@ -1,36 +1,26 @@
-package ggsbot.notification.updaters;
+package ggsbot.updaters;
 
 import ggsbot.bot.GeoPointBot;
-import ggsbot.constants.Messages;
 import ggsbot.model.access.ClientDao;
 import ggsbot.model.data.Client;
+import ggsbot.updaters.callbacks.FunctionInitMessage;
 import ggsbot.service.SettingsKeyboardService;
 import ggsbot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
-/**
- * Класс для отправки видео-информации, о новой фиче бота
- * всем пользователям
- * Обновление 29.01.2022 - возможность поделиться координатами с ботом из яндекс карт
- */
 @Service
-public class Updater1 {
+public class UpdateEngine {
 
     private final ClientDao clientDao;
 
@@ -38,12 +28,12 @@ public class Updater1 {
 
     private final SettingsKeyboardService keyboardService;
 
-    private static final Logger logger = LoggerFactory.getLogger(Updater1.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpdateEngine.class);
 
     private static final Long WAIT = 10 * 1000L;
 
     @Autowired
-    public Updater1(ClientDao clientDao, GeoPointBot geoPointBot, SettingsKeyboardService keyboardService) {
+    public UpdateEngine(ClientDao clientDao, GeoPointBot geoPointBot, SettingsKeyboardService keyboardService) {
         this.clientDao = clientDao;
         this.geoPointBot = geoPointBot;
         this.keyboardService = keyboardService;
@@ -51,17 +41,13 @@ public class Updater1 {
 
     @PostConstruct
     public void run() {
-        new Thread(this::sendInfo).start();
+//        new Thread(() -> sendInfo(List.of(UpdateMessagesUtil::initUpdateMessage1,
+//                UpdateMessagesUtil::initUpdateVideo))).start();
+        new Thread(() -> sendInfo(
+                List.of(UpdateMessagesUtil::initUpdateMessage2))).start();
     }
 
-    private void sendInfo(){
-        File infoAboutUpdate;
-        try {
-            infoAboutUpdate = new ClassPathResource("updates/update-2022-01-29.mp4").getFile();
-        } catch (IOException e) {
-            logger.error("No such file", e);
-            return;
-        }
+    private void sendInfo(List<FunctionInitMessage> functions){
         int i = 1;
         for (Client client : clientDao.getAllClients()) {
                 // обход лимита телеграма на отправку сообщений
@@ -74,10 +60,12 @@ public class Updater1 {
                 }
                 logger.info("{} Start sending update to {}", i, client.getName());
                 try {
-                    geoPointBot.sendAnswer(List.of(
-                            initUpdateMessage(String.valueOf(client.getId())),
-                            initUpdateVideo(String.valueOf(client.getId()), infoAboutUpdate),
-                            initStartMessage(client)));
+                    List<PartialBotApiMethod<?>> updateMsg = functions.stream()
+                            .map(func -> func.initUpdate(
+                                    String.valueOf(client.getId())))
+                                    .collect(Collectors.toList());
+                    updateMsg.add(initStartMessage(client));
+                    geoPointBot.sendAnswer(updateMsg);
                 } catch (TelegramApiException e) {
                     logger.error("{} Failed sending update to {}", i, client.getName());
                     continue;
@@ -85,22 +73,6 @@ public class Updater1 {
                 logger.info("{} Sucessfully sending update to {}", i, client.getName());
                 i++;
         }
-    }
-
-    private SendVideo initUpdateVideo(String clientId, File file) {
-        return SendVideo
-                .builder()
-                .chatId(clientId)
-                .video(new InputFile(file))
-                .build();
-    }
-
-    private SendMessage initUpdateMessage(String clientId) {
-        return SendMessage
-                .builder()
-                .chatId(clientId)
-                .text(Messages.UPDATE)
-                .build();
     }
 
     // после апдейта отправляем то сообщение, которое висело у клиента

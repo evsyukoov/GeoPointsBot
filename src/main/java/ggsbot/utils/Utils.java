@@ -56,7 +56,7 @@ public class Utils {
         return Utils.initSendMessage(client, Messages.SEND_LOCATION, initReplyKeyboardMarkup());
     }
 
-    public static SendMessage initStartMessage(Client client, String ... messages) {
+    public static SendMessage initMessage(Client client, String ... messages) {
         return Utils.initSendMessage(client,
                 String.join("\n", Arrays.asList(messages)),
                 initReplyKeyboardMarkup());

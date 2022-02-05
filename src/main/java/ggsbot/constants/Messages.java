@@ -26,7 +26,13 @@ public class Messages {
 
     public static final String POINTS_NOT_FOUND = "Не найдено ни одной точки в заданном радиусе";
 
-    public static final String UPDATE = "Небольшое обновление.\n" +
-            "Теперь ты можешь поделиться с ботом координатами из яндекс карт. \n" +
-            "Сейчас придет короткое видео о том, как это сделать";
+    public static final String WRONG_TEXT_COORDS = "Неправильный формат ввода. Широта и долгота разделяются точкой с запятой.\n" +
+            "Пример: 55.752102; 37.623224";
+
+    public static final String WRONG_YANDEX_MAP_LINK =
+            "Невалидная ссылка. Убедитесь что вы делитесь координатами из приложения Яндекс карты или используйте другой метод отправки координат.";
+
+    public static final String INCORRECT_INPUT = "Отправленные координаты не соответсвуют ни одному из поддерживаемых методов.";
+
+    public static final String INCORRECT_INPUT_SETTINGS = "Вы находитесь в разделе настроек.\nДля продолжения работы их нужно подтвердить.";
 }

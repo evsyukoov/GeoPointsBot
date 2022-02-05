@@ -1,6 +1,7 @@
 package ggsbot.service;
 
 import com.jayway.jsonpath.JsonPath;
+import ggsbot.errors.YandexMapException;
 import ggsbot.handlers.Coordinate;
 import ggsbot.states.LocationBotState;
 import org.jsoup.Jsoup;
@@ -52,7 +53,7 @@ public class YandexMapService {
                     Double.parseDouble(coords.split(",")[0]));
         } catch (Exception e) {
             logger.error("Problem with connect or parsing html-content: {}, ex message: {}", link, e.getMessage());
-            throw new RuntimeException();
+            throw new YandexMapException();
         }
     }
 }

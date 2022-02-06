@@ -1,5 +1,5 @@
 package ggsbot.states;
 
 public enum State {
-    LOCATION, SETTINGS
+    LOCATION, SETTINGS, DONATE
 }

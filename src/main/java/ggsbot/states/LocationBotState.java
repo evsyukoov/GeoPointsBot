@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,9 +44,16 @@ public class LocationBotState implements BotState {
 
     private String yandexMapLink;
 
+    private String providerPaymentToken;
+
     @Value("${yandex.map.link}")
     public void setYandexMapLink(String yandexMapLink) {
         this.yandexMapLink = yandexMapLink;
+    }
+
+    @Value("${payment.provider.token}")
+    public void setProviderPaymentToken(String providerPaymentToken) {
+        this.providerPaymentToken = providerPaymentToken;
     }
 
     @Autowired
@@ -90,7 +99,11 @@ public class LocationBotState implements BotState {
         } else if (isSettingsReceived(update)) {
             clientService.incrementClientState(client);
             return List.of(settingsKeyboardService.initInlineKeyboard(client));
-        } else {
+        } else if (isDonateReceived(update)) {
+            clientService.updateClientState(client, State.DONATE);
+            return List.of(initDonate(client));
+        }
+        else {
             return List.of(Utils.initMessage(client, Messages.INCORRECT_INPUT, Messages.SEND_LOCATION));
         }
         return Collections.emptyList();
@@ -116,7 +129,8 @@ public class LocationBotState implements BotState {
 
     private boolean isCoordinatesReceived(Update update) {
         return isTextInfoReceived(update) &&
-                !update.getMessage().getText().equals(Messages.SETTINGS);
+                !update.getMessage().getText().equals(Messages.SETTINGS) &&
+                !update.getMessage().getText().equals(Messages.DONATE);
     }
 
     private boolean isYandexMapLinkReceived(Update update) {
@@ -158,12 +172,32 @@ public class LocationBotState implements BotState {
                 update.getMessage().getText().equals(Messages.SETTINGS);
     }
 
+    private boolean isDonateReceived(Update update) {
+        return isTextInfoReceived(update) &&
+                update.getMessage().getText().equals(Messages.DONATE);
+    }
+
     private SendDocument initSendDocument(File file, Client client) {
         return SendDocument.builder()
                 .chatId(String.valueOf(client.getId()))
                 .document(new InputFile(file, Utils.getResultFileName(file)))
                 .build();
 
+    }
+
+    private SendInvoice initDonate(Client client) {
+        SendInvoice invoice = new SendInvoice();
+        invoice.setChatId(String.valueOf(client.getId()));
+        invoice.setCurrency("RUB");
+        invoice.setDescription("Поддержать разработчика");
+        invoice.setPrices(List.of(LabeledPrice.builder()
+                .amount(10000).label("Руб").build()));
+        invoice.setPayload("Перевести 100 рублей");
+        invoice.setProviderToken(providerPaymentToken);
+        invoice.setTitle("Разработчику на кофе");
+        invoice.setAllowSendingWithoutReply(true);
+        invoice.setIsFlexible(false);
+        return invoice;
     }
 
 }

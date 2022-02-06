@@ -4,6 +4,7 @@ import ggsbot.model.access.ClientDao;
 import ggsbot.model.data.Client;
 import ggsbot.model.data.FileFormat;
 import ggsbot.model.data.Settings;
+import ggsbot.states.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,9 @@ public class ClientService {
     }
 
     private long getId(Update update) {
-        if (update.getMessage() != null) {
+        if (update.getPreCheckoutQuery() != null) {
+            return update.getPreCheckoutQuery().getFrom().getId();
+        } else if (update.getMessage() != null) {
             return update.getMessage().getChatId();
         } else {
             return update.getCallbackQuery().getMessage().getChatId();
@@ -76,6 +79,11 @@ public class ClientService {
 
     public void incrementClientState(Client client) {
         client.setState(client.getState() + 1);
+        clientDao.updateClient(client);
+    }
+
+    public void updateClientState(Client client, State state) {
+        client.setState(state.ordinal());
         clientDao.updateClient(client);
     }
 

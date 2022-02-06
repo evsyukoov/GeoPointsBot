@@ -1,12 +1,14 @@
 package ggsbot.constants;
 
+import java.nio.charset.StandardCharsets;
+
 public class Messages {
 
     public static final String SEND_LOCATION = "Прикрепите геолокацию (или отправьте широта;долгота или поделитесь точкой из яндекс карт)";
 
     public static final String START = "/start";
 
-    public static final String SETTINGS = "Настройки";
+    public static final String SETTINGS = "🔧 Настройки";
 
     public static final String SETTINGS_MESSAGE = "Выберите радиус поиска, необходимые классы точек и формат выходного файла";
 
@@ -35,4 +37,10 @@ public class Messages {
     public static final String INCORRECT_INPUT = "Отправленные координаты не соответсвуют ни одному из поддерживаемых методов.";
 
     public static final String INCORRECT_INPUT_SETTINGS = "Вы находитесь в разделе настроек.\nДля продолжения работы их нужно подтвердить.";
+
+    public static final String DONATE = "💰 Разработчику на кофе";
+
+    public static final String PAYMENT_RESULT_OK = "Спасибо! Оплата успешно совершена.";
+
+
 }

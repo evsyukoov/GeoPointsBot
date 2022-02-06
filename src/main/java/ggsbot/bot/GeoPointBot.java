@@ -5,9 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.PartialBotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendVideo;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
@@ -68,6 +70,10 @@ public class GeoPointBot extends TelegramWebhookBot {
                     this.execute((EditMessageReplyMarkup) send);
                 } else if (send instanceof SendVideo) {
                     this.execute((SendVideo) send);
+                } else if (send instanceof SendInvoice) {
+                    this.execute((SendInvoice) send);
+                } else if (send instanceof AnswerPreCheckoutQuery) {
+                    this.execute((AnswerPreCheckoutQuery) send);
                 }
             } catch (TelegramApiException e) {
                 // TODO ошибка может возникнуть, если клиент ничего не изменил в настройках,

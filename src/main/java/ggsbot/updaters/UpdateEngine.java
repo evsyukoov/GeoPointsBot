@@ -39,7 +39,7 @@ public class UpdateEngine {
         this.keyboardService = keyboardService;
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void run() {
 //        new Thread(() -> sendInfo(List.of(UpdateMessagesUtil::initUpdateMessage1,
 //                UpdateMessagesUtil::initUpdateVideo))).start();

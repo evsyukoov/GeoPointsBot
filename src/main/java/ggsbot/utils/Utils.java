@@ -3,7 +3,9 @@ package ggsbot.utils;
 import ggsbot.constants.Messages;
 import ggsbot.model.data.Client;
 import ggsbot.states.State;
+import org.telegram.telegrambots.meta.api.methods.send.SendInvoice;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
@@ -65,14 +67,19 @@ public class Utils {
     private static ReplyKeyboardMarkup initReplyKeyboardMarkup() {
         ReplyKeyboardMarkup markup = new ReplyKeyboardMarkup();
         KeyboardRow keyboardRow = new KeyboardRow();
-        KeyboardButton button = new KeyboardButton();
-        button.setText(Messages.SETTINGS);
         List<KeyboardRow> keyboardRows = List.of(keyboardRow);
-        keyboardRow.add(button);
+        keyboardRow.add(newButton(Messages.SETTINGS));
+        keyboardRow.add(newButton(Messages.DONATE));
         markup.setKeyboard(keyboardRows);
         markup.setOneTimeKeyboard(true);
         markup.setResizeKeyboard(true);
         return markup;
+    }
+
+    private static KeyboardButton newButton(String message) {
+        KeyboardButton button = new KeyboardButton();
+        button.setText(message);
+        return button;
     }
 
 }

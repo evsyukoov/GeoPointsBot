@@ -34,4 +34,22 @@ public class PointDao {
         return points;
     }
 
+    public List<Point> getAllPointsByZone(List<Integer> zones) {
+        List<Point> points;
+        try(Session session = factory.getCurrentSession()) {
+            session.beginTransaction();
+            StringBuilder queryStr = new StringBuilder("FROM Point WHERE ");
+            for (int i = 0; i < zones.size(); i++) {
+                queryStr.append("zone =: zone").append(i).append(" OR ");
+            }
+            Query<Point> query = session.createQuery(queryStr.substring(0, queryStr.length() - 4), Point.class);
+            for (int i = 0; i < zones.size(); i++) {
+                query.setParameter("zone" + i, zones.get(i));
+            }
+            points = query.list();
+            session.getTransaction().commit();
+        }
+        return points;
+    }
+
 }

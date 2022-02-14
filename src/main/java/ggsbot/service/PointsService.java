@@ -7,8 +7,13 @@ import ggsbot.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 public class PointsService {
@@ -27,6 +32,18 @@ public class PointsService {
         int zone = Utils.findZone(lon);
         List<Point> points = pointDao.getAllPointsByZone(zone);
         return filterPoints(points, lat, lon, client);
+    }
+
+    public List<Point> getPoints(Polygon polygon, Client client) {
+        return pointDao.getAllPointsByZone(findAllZonesFromPolygon(polygon));
+    }
+
+    private List<Integer> findAllZonesFromPolygon(Polygon polygon) {
+        List<Integer> zones = new ArrayList<>(2);
+        IntStream.range(Utils.findZone(Arrays.stream(polygon.xpoints).min().getAsInt()),
+                Utils.findZone(Arrays.stream(polygon.xpoints).max().getAsInt()) + 1)
+                .forEach(zones::add);
+        return zones;
     }
 
     private List<Point> filterPoints(List<Point> list, double lat, double lon, Client client) {

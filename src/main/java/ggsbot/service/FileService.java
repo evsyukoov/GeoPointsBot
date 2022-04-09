@@ -5,6 +5,7 @@ import ggsbot.model.data.FileFormat;
 import ggsbot.model.data.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.apache.commons.math3.util.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class FileService {
                         getPointClassPrefix(p.getPointClass()),
                         p.getName(),
                         getDescription(p),
-                        p.getLon(), p.getLat(), 0));
+                        Precision.round(p.getLon(), 6), Precision.round(p.getLat(), 6), 0));
             }
             kml.write("</Document>\n</kml>");
         }
@@ -66,7 +67,8 @@ public class FileService {
         try (Writer gpx = new OutputStreamWriter(new FileOutputStream(file))) {
             gpx.write(GPX_HEADER);
             for (Point p : points) {
-                gpx.write(String.format("<wpt lat=\"%s\" lon=\"%s\"><name>%s%s</name><desc>%s</desc></wpt>\n", p.getLat(), p.getLon(),
+                gpx.write(String.format("<wpt lat=\"%s\" lon=\"%s\"><name>%s%s</name><desc>%s</desc></wpt>\n",
+                        Precision.round(p.getLat(), 6), Precision.round(p.getLon(), 6),
                         getPointClassPrefix(p.getPointClass()),
                         p.getName(),
                         getDescription(p)));

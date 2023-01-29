@@ -27,12 +27,12 @@ public class YandexMapService {
 
     private String jsonPath;
 
-    @Value("${yandex.html.query}")
+    @Value("${yandex.map.html-query}")
     public void setHtmlQuery(String htmlQuery) {
         this.htmlQuery = htmlQuery;
     }
 
-    @Value("${yandex.json.path}")
+    @Value("${yandex.map.json-path}")
     public void setJsonPath(String jsonPath) {
         this.jsonPath = jsonPath;
     }

@@ -1,0 +1,28 @@
+server:
+  port: 8081
+
+bot:
+  token: ${GEO_POINTS_BOT_TOKEN}
+  name: ${GEO_POINTS_BOT_NAME}
+
+nginx:
+  prod:
+    host: ${REMOTE_SERVER_HOST}
+    port: 8443
+
+point:
+  classes: 1, 2, 3, 4, Неизвестный, 1 ГВО, 2 ГВО
+
+search:
+  radius: 5, 10, 20
+  default-radius: 10
+
+yandex:
+  map:
+    link: https://yandex.ru/maps/-/
+    html-query: script.state-view
+    json-path: $.config.query.whatshere.point
+
+update-dictionaries:
+  directory: ~/GVO_download
+  enable: true

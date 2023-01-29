@@ -27,7 +27,7 @@ public class ClientService {
         this.defaultRadius = defaultRadius;
     }
 
-    @Value("${point.classes}")
+    @Value("#{'${point.classes}'.split(',\\s*')}")
     public void setPointClasses(List<String> pointClasses) {
         this.pointClasses = pointClasses;
     }

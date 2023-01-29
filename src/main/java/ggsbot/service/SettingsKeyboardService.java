@@ -34,12 +34,12 @@ public class SettingsKeyboardService {
         this.clientService = clientService;
     }
 
-    @Value("${search.radius}")
+    @Value("#{'${search.radius}'.split(',\\s*')}")
     public void setAvailableRadius(List<Integer> availableRadius) {
         this.availableRadius = availableRadius;
     }
 
-    @Value("${point.classes}")
+    @Value("#{'${point.classes}'.split(',\\s*')}")
     public void setPointClasses(List<String> pointClasses) {
         this.availablePointClasses = pointClasses;
     }

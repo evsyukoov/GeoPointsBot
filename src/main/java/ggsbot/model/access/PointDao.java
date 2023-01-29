@@ -22,6 +22,14 @@ public class PointDao {
                 .buildSessionFactory();
     }
 
+    public void savePoint(Point point) {
+        try(Session session = factory.getCurrentSession()) {
+            session.beginTransaction();
+            session.save(point);
+            session.getTransaction().commit();
+        }
+    }
+
     public List<Point> getAllPointsByZone(int zone) {
         List<Point> points;
         try(Session session = factory.getCurrentSession()) {

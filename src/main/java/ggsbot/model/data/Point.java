@@ -43,6 +43,9 @@ public class Point {
     @Column(name="zone")
     private Integer zone;
 
+    @Column(name="description")
+    private String description;
+
     public long getId() {
         return id;
     }
@@ -137,5 +140,13 @@ public class Point {
 
     public void setMunicipal(String municipal) {
         this.municipal = municipal;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -5,6 +5,7 @@ import ggsbot.dto.Data;
 import ggsbot.dto.Feature;
 import ggsbot.mappers.DtoToDataMapper;
 import ggsbot.model.access.PointDao;
+import ggsbot.model.data.Point;
 import ggsbot.states.LocationBotState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ConditionalOnProperty(prefix = "update-dictionaries", name = "enable", havingValue = "true")
 @Component
@@ -71,13 +73,15 @@ public class DictionaryUpdater {
         }
         logger.info("Parsing geoData was success");
         long startUpdateTime = System.currentTimeMillis();
-        allPoints.stream()
+
+        List<Point> points = allPoints.stream()
                 .map(Data::getFeatures)
                 .flatMap(Collection::stream)
                 .map(Feature::getAttributes)
-                .forEach(attr -> {
-                    pointDao.savePoint(dtoToDataMapper.dtoToPoint(attr));
-                });
+                .map(dtoToDataMapper::dtoToPoint)
+                .collect(Collectors.toList());
+        logger.info("Successfully transform points to ORM model");
+        pointDao.savePoints(points);
         logger.info("Successfully update POINTS dictionary. Time ms: {}", System.currentTimeMillis() - startUpdateTime);
     }
 }

@@ -1,14 +1,15 @@
 package ggsbot.model.access;
 
 import ggsbot.model.data.Point;
-import org.checkerframework.framework.qual.Unused;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.StatelessSession;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -16,16 +17,27 @@ public class PointDao {
 
     final private static SessionFactory factory;
 
+    private static final Logger logger = LoggerFactory.getLogger(PointDao.class);
+
     static {
         factory = new Configuration()
                 .configure("hibernate_settings.cfg.xml")
                 .buildSessionFactory();
     }
 
-    public void savePoint(Point point) {
-        try(Session session = factory.getCurrentSession()) {
+    public void savePoints(List<Point> points) {
+        try(StatelessSession session = factory.openStatelessSession()) {
             session.beginTransaction();
-            session.save(point);
+            int i = 0;
+            long time = System.currentTimeMillis();
+            for (Point p : points) {
+                session.insert(p);
+                if (i % 1000 == 0) {
+                    logger.info("{} Iteration - {} ms", i, System.currentTimeMillis() - time);
+                    time = System.currentTimeMillis();
+                }
+                i++;
+            }
             session.getTransaction().commit();
         }
     }

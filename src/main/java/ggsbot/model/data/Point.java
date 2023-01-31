@@ -7,6 +7,7 @@ import javax.persistence.*;
 public class Point {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
 
@@ -50,7 +51,7 @@ public class Point {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

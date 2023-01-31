@@ -1,5 +1,6 @@
 package ggsbot.service;
 
+import ggsbot.constants.Const;
 import ggsbot.model.data.Client;
 import ggsbot.model.data.FileFormat;
 import ggsbot.model.data.Point;
@@ -78,11 +79,15 @@ public class FileService {
     }
 
     private String getPointClassPrefix(String s) {
+        if (s.contains(Const.HEIGHT)) {
+            return s.charAt(0) + "Н_";
+        }
         return s.equals("Неизвестный") ? "" : (s + "_");
     }
 
     private String getDescription(Point p) {
-        return String.format("Catalog number: %s, Class: %s, Mark: %s, Center-type: %s",
+        return p.getPointClass().contains(Const.HEIGHT) ?
+            p.getDescription() : String.format("Catalog number: %s, Class: %s, Mark: %s, Center-type: %s",
                 p.getIndex() == null ? "-" : p.getIndex(), // Крымский кейс
                 p.getPointClass(),
                 p.getMark() == null ? "-" : p.getMark(),

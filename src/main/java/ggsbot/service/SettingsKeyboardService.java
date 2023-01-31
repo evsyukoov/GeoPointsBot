@@ -126,7 +126,7 @@ public class SettingsKeyboardService {
 
     public Optional<Settings> setSettings(Update update, Client client) {
         Settings settings = client.getSettings();
-        List<String> pointClasses = new ArrayList<>(5);
+        List<String> pointClasses = new ArrayList<>(7);
         List<String> fileFormats = new ArrayList<>(2);
         InlineKeyboardMarkup markup = update.getCallbackQuery().getMessage().getReplyMarkup();
         final AtomicBoolean fillRadius = new AtomicBoolean();
@@ -156,7 +156,10 @@ public class SettingsKeyboardService {
     }
 
     private String getButtonPayload(String callbackData) {
-        return callbackData.split(" ")[1];
+        String[] data = callbackData.split(" ");
+        //обычный пункт или высотный
+        return data.length == 2 ? callbackData.split(" ")[1] :
+                (callbackData.split(" ")[1] + " " + callbackData.split(" ")[2]);
     }
 
     public EditMessageReplyMarkup editKeyboard(Update update, Client client) {

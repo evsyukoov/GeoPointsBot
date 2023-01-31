@@ -43,8 +43,10 @@ public class UpdateEngine {
     public void run() {
 //        new Thread(() -> sendInfo(List.of(UpdateMessagesUtil::initUpdateMessage1,
 //                UpdateMessagesUtil::initUpdateVideo))).start();
+//        new Thread(() -> sendInfo(
+//                List.of(UpdateMessagesUtil::initUpdateMessage2))).start();
         new Thread(() -> sendInfo(
-                List.of(UpdateMessagesUtil::initUpdateMessage2))).start();
+                List.of(UpdateMessagesUtil::initUpdateMessage3))).start();
     }
 
     private void sendInfo(List<FunctionInitMessage> functions){

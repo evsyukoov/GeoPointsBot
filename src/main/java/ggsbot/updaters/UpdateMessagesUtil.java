@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import static ggsbot.constants.UpdateMessages.UPDATE1;
 import static ggsbot.constants.UpdateMessages.UPDATE2;
+import static ggsbot.constants.UpdateMessages.UPDATE3;
 
 /**
  * Класс для хранения методов, формирующих сообщение об обновлении пользователю
@@ -61,6 +62,18 @@ public class UpdateMessagesUtil {
     public static SendMessage initUpdateMessage2(String clientId) {
         SendMessage sm = initMessage(clientId);
         sm.setText(UPDATE2);
+        return sm;
+    }
+
+    /**
+     * Обновление 31.01.2023 - Добавлены нивелирные пункты по РФ и бывшему СНГ.
+     * Добавлены польщовательские настройки
+     * @param clientId
+     * @return
+     */
+    public static SendMessage initUpdateMessage3(String clientId) {
+        SendMessage sm = initMessage(clientId);
+        sm.setText(UPDATE3);
         return sm;
     }
 }

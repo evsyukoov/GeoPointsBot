@@ -25,4 +25,4 @@ yandex:
 
 update-dictionaries:
   directory: /home/denis/GVO_download
-  enable: true
+  enable: false

@@ -11,6 +11,7 @@ import java.io.IOException;
 import static ggsbot.constants.UpdateMessages.UPDATE1;
 import static ggsbot.constants.UpdateMessages.UPDATE2;
 import static ggsbot.constants.UpdateMessages.UPDATE3;
+import static ggsbot.constants.UpdateMessages.UPDATE4;
 
 /**
  * Класс для хранения методов, формирующих сообщение об обновлении пользователю
@@ -74,6 +75,18 @@ public class UpdateMessagesUtil {
     public static SendMessage initUpdateMessage3(String clientId) {
         SendMessage sm = initMessage(clientId);
         sm.setText(UPDATE3);
+        return sm;
+    }
+
+    /**
+     * Обновление 30.08.2023 - Восстановлена работа бота после смерти БД
+     * @param clientId
+     * @return
+     */
+    //TODO делать автодампы БД!!!
+    public static SendMessage initUpdateMessage4(String clientId) {
+        SendMessage sm = initMessage(clientId);
+        sm.setText(UPDATE4);
         return sm;
     }
 }

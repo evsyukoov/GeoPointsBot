@@ -39,14 +39,16 @@ public class UpdateEngine {
         this.keyboardService = keyboardService;
     }
 
-    //@PostConstruct
+    @PostConstruct
     public void run() {
 //        new Thread(() -> sendInfo(List.of(UpdateMessagesUtil::initUpdateMessage1,
 //                UpdateMessagesUtil::initUpdateVideo))).start();
 //        new Thread(() -> sendInfo(
 //                List.of(UpdateMessagesUtil::initUpdateMessage2))).start();
+//        new Thread(() -> sendInfo(
+//                List.of(UpdateMessagesUtil::initUpdateMessage3))).start();
         new Thread(() -> sendInfo(
-                List.of(UpdateMessagesUtil::initUpdateMessage3))).start();
+                List.of(UpdateMessagesUtil::initUpdateMessage4))).start();
     }
 
     private void sendInfo(List<FunctionInitMessage> functions){

@@ -15,8 +15,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
+
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 
 
 @Configuration
@@ -34,6 +39,18 @@ public class Config {
     private String prodPort;
 
     private String serverLocalPort;
+
+    @Value("${proxy.enable}")
+    private boolean proxyEnable;
+
+    @Value("${proxy.host}")
+    private String proxyHost;
+
+    @Value("${proxy.port}")
+    private int proxyPort;
+
+    @Value("${proxy.type}")
+    private DefaultBotOptions.ProxyType proxyType;
 
     @Value("${server.port}")
     public void setServerLocalPort(String serverLocalPort) {
@@ -67,8 +84,8 @@ public class Config {
     //для разработки на локальной машине
     @Bean
     @Profile("local")
-    public void createWebhook() throws JsonProcessingException {
-        ResponseEntity<Object> response = new RestTemplate().getForEntity(
+    public void createWebhook(RestTemplate restTemplate) throws JsonProcessingException {
+        ResponseEntity<Object> response = restTemplate.getForEntity(
                 generateWebhookUrl(startNgrok()),
                 Object.class);
         logger.info("Set ngrok-webhook, response - {}", mapper.writeValueAsString(response));
@@ -76,11 +93,11 @@ public class Config {
 
     @Bean
     @Profile("prod")
-    public void createProdWebhook() throws JsonProcessingException {
-        ResponseEntity response = getWebhookInfo();
+    public void createProdWebhook(RestTemplate restTemplate) throws JsonProcessingException {
+        ResponseEntity response = getWebhookInfo(restTemplate);
         logger.info("Get Webhook Info - {}", mapper.writeValueAsString(response));
         if (!isAlreadyRegisterProdHost(response.getBody())) {
-            ResponseEntity<Object> resp = new RestTemplate().getForEntity(
+            ResponseEntity<Object> resp = restTemplate.getForEntity(
                     generateWebhookUrl(prodHost, prodPort),
                     Object.class);
             
@@ -107,8 +124,8 @@ public class Config {
         return httpTunnel.getPublicUrl();
     }
 
-    private ResponseEntity getWebhookInfo() {
-        ResponseEntity response = new RestTemplate().getForEntity(
+    private ResponseEntity getWebhookInfo(RestTemplate restTemplate) {
+        ResponseEntity response = restTemplate.getForEntity(
                 String.format("https://api.telegram.org/bot%s/getWebhookInfo", token),
                 Object.class
         );
@@ -123,7 +140,35 @@ public class Config {
     }
 
     @Bean
-    public RestTemplate restTemplate() {
+    public Proxy proxy() {
+        if (proxyEnable) {
+            Proxy.Type type = proxyType == DefaultBotOptions.ProxyType.SOCKS5
+                    || proxyType == DefaultBotOptions.ProxyType.SOCKS4
+                    ? Proxy.Type.SOCKS : Proxy.Type.HTTP;
+            return new Proxy(type, new InetSocketAddress(proxyHost, proxyPort));
+        }
+        return Proxy.NO_PROXY;
+    }
+
+    @Bean
+    public DefaultBotOptions defaultBotOptions() {
+        DefaultBotOptions options = new DefaultBotOptions();
+        if (proxyEnable) {
+            logger.info("Setting up proxy {}:{} ({})", proxyHost, proxyPort, proxyType);
+            options.setProxyHost(proxyHost);
+            options.setProxyPort(proxyPort);
+            options.setProxyType(proxyType);
+        }
+        return options;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(Proxy proxy) {
+        if (proxyEnable) {
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            factory.setProxy(proxy);
+            return new RestTemplate(factory);
+        }
         return new RestTemplate();
     }
 }

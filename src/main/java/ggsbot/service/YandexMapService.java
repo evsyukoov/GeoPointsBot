@@ -9,15 +9,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 @Service
 public class YandexMapService {
-
-    private final RestTemplate restTemplate;
 
     private static final Logger logger = LoggerFactory.getLogger(LocationBotState.class);
 
@@ -35,11 +31,6 @@ public class YandexMapService {
     @Value("${yandex.map.json-path}")
     public void setJsonPath(String jsonPath) {
         this.jsonPath = jsonPath;
-    }
-
-    @Autowired
-    public YandexMapService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
     }
 
     public Coordinate getCoordsFromLink(String link) {

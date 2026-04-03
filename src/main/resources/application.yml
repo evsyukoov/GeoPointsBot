@@ -23,6 +23,12 @@ yandex:
     html-query: script.state-view
     json-path: $.config.query.whatshere.point
 
+proxy:
+  enable: ${BOT_PROXY_ENABLE:false}
+  host: ${BOT_PROXY_HOST:}
+  port: ${BOT_PROXY_PORT:0}
+  type: ${BOT_PROXY_TYPE:SOCKS5}
+
 update-dictionaries:
   directory: /home/denis/GVO_download
   enable: false

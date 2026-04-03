@@ -24,10 +24,10 @@ yandex:
     json-path: $.config.query.whatshere.point
 
 proxy:
-  enable: ${BOT_PROXY_ENABLE:false}
+  enable: ${BOT_PROXY_ENABLED:false}
   host: ${BOT_PROXY_HOST:}
   port: ${BOT_PROXY_PORT:0}
-  type: ${BOT_PROXY_TYPE:SOCKS5}
+  type: ${BOT_PROXY_TYPE:HTTP}
 
 update-dictionaries:
   directory: /home/denis/GVO_download
